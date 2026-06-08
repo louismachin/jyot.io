@@ -1,0 +1,3 @@
+[submodule "app/jyotish"]
+	path = app/jyotish
+	url = https://github.com/louismachin/jyotish
