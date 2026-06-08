@@ -23,10 +23,11 @@ post '/submit' do
 end
 
 get '/:uuid' do
-    data = STORE[params[:uuid]]
+    @uuid = params[:uuid]
+    data  = STORE[@uuid]
     halt 404, "Unknown id" unless data
 
-    name   = data[:name]
+    @name  = data[:name]
     lat    = data[:lat]
     lon    = data[:lon]
     year   = data[:year]
@@ -39,6 +40,6 @@ get '/:uuid' do
     # continue here — all values are ready to use
     puts "Received: #{lat}, #{lon} on #{year}-#{month}-#{day} #{hour}:#{minute}"
 
-    @data = consolidated_data(lat, lon, year, month, day, hour, minute, timezone_offset)
+    @data = consolidated_data_and_charts(lat, lon, year, month, day, hour, minute, timezone_offset, @uuid, "./public/tmp/")
     erb :chart
 end
