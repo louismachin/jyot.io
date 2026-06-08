@@ -1,7 +1,14 @@
 <form action="/submit" method="post">
     <label>Name: <input name="name"></label><br>
-    <label>Latitude: <input type="number" name="lat" step="any" required></label><br>
-    <label>Longitude: <input type="number" name="lon" step="any" required></label><br>
+    <div class="combo">
+        <label>Location:
+            <input type="text" id="city-search" autocomplete="off" placeholder="Start typing a city…" required>
+        </label>
+        <ul id="city-results" class="results" hidden></ul>
+    </div>
+    <input type="hidden" name="lat" id="lat">
+    <input type="hidden" name="lon" id="lon">
+    <input type="hidden" name="timezone" id="timezone"><br>
     <label>Year: <input type="number" name="year" min="1"  max="9999" required></label><br>
     <label>Month: <input type="number" name="month" min="1"  max="12"   required></label><br>
     <label>Day: <input type="number" name="day" min="1"  max="31"   required></label><br>
@@ -9,3 +16,89 @@
     <label>Minute: <input type="number" name="minute" min="0"  max="59"   required></label><br>
     <button type="submit">Submit</button>
 </form>
+
+<style>
+    .combo { position: relative; display: inline-block; }
+    .combo .results {
+        position: absolute; left: 0; right: 0; top: 100%;
+        margin: 0; padding: 0; list-style: none;
+        border: 1px solid #ccc; border-top: none; background: #fff;
+        max-height: 200px; overflow-y: auto; z-index: 10;
+    }
+    .combo .results li { padding: 4px 8px; cursor: pointer; white-space: nowrap; }
+    .combo .results li:hover, .combo .results li.active { background: #e8e8e8; }
+</style>
+
+<script>
+    (function () {
+        const search  = document.getElementById('city-search');
+        const results = document.getElementById('city-results');
+        const latEl   = document.getElementById('lat');
+        const lonEl   = document.getElementById('lon');
+        const tzEl    = document.getElementById('timezone');
+
+        let items = [], active = -1, timer;
+
+        function clearPick() { latEl.value = lonEl.value = tzEl.value = ''; }
+        function hide() { results.hidden = true; results.innerHTML = ''; active = -1; }
+
+        function choose(i) {
+            const c = items[i];
+            if (!c) return;
+            search.value = c.name + ', ' + c.cc;
+            latEl.value = c.lat;
+            lonEl.value = c.lon;
+            tzEl.value  = c.tz;
+            search.setCustomValidity('');
+            hide();
+        }
+
+        function render(cities) {
+            items = cities;
+            results.innerHTML = '';
+            if (!cities.length) { hide(); return; }
+            cities.forEach((c, i) => {
+                const li = document.createElement('li');
+                li.textContent = c.name + ', ' + c.cc;
+                li.addEventListener('mousedown', e => { e.preventDefault(); choose(i); }); // mousedown fires before blur
+                results.appendChild(li);
+            });
+            results.hidden = false;
+            active = -1;
+        }
+
+        search.addEventListener('input', () => {
+            clearPick(); // typing invalidates a prior selection
+            search.setCustomValidity('');
+            const q = search.value.trim();
+            clearTimeout(timer);
+            if (q.length < 2) { hide(); return; }
+            timer = setTimeout(() => {
+            fetch('/cities?q=' + encodeURIComponent(q))
+                .then(r => r.json())
+                .then(render);
+            }, 150); // debounce
+        });
+
+        search.addEventListener('keydown', e => {
+            if (results.hidden) return;
+            const lis = [...results.children];
+            if      (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(active + 1, lis.length - 1); }
+            else if (e.key === 'ArrowUp')   { e.preventDefault(); active = Math.max(active - 1, 0); }
+            else if (e.key === 'Enter')     { e.preventDefault(); if (active >= 0) choose(active); return; }
+            else if (e.key === 'Escape')    { hide(); return; }
+            else return;
+            lis.forEach((li, i) => li.classList.toggle('active', i === active));
+        });
+
+        document.addEventListener('click', e => { if (!e.target.closest('.combo')) hide(); });
+
+        search.form.addEventListener('submit', e => {
+            if (!latEl.value) { // hidden inputs can't be `required`, checking manually
+                e.preventDefault();
+                search.setCustomValidity('Please pick a city from the list.');
+                search.reportValidity();
+            }
+        });
+    })()
+</script>

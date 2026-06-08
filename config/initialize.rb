@@ -2,8 +2,6 @@ require 'sinatra'
 require 'redcarpet'
 require 'securerandom'
 
-APP_ROOT = File.expand_path(__dir__)
-
 configure do
     set :bind, '0.0.0.0'
     set :port, 9394
@@ -16,4 +14,5 @@ end
 
 require_relative '../app/jyotish/lib/main'
 
+require_relative '../app/routes/cities'
 require_relative '../app/routes/system'
