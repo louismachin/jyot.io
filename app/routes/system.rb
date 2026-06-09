@@ -37,7 +37,6 @@ get '/:uuid' do
     minute = data[:minute]
     timezone_offset = data[:timezone_offset]
 
-    # continue here — all values are ready to use
     puts "Received: #{lat}, #{lon} on #{year}-#{month}-#{day} #{hour}:#{minute}"
 
     @data = consolidated_data_and_charts(lat, lon, year, month, day, hour, minute, timezone_offset, @uuid, "./public/tmp/")
