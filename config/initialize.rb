@@ -11,8 +11,10 @@ configure do
     disable :protection
 end
 
+FileUtils.mkdir('./public/tmp') unless File.directory?('./public/tmp')
 
 require_relative '../app/jyotish/lib/main'
 
 require_relative '../app/routes/cities'
 require_relative '../app/routes/system'
+require_relative '../app/routes/thelema'
