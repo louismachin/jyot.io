@@ -11,6 +11,10 @@ configure do
     disable :protection
 end
 
+before '/api/*' do
+    headers['Access-Control-Allow-Origin'] = '*'
+end
+
 FileUtils.mkdir('./public/tmp') unless File.directory?('./public/tmp')
 
 require_relative '../app/jyotish/lib/main'
