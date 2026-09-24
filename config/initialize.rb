@@ -11,7 +11,7 @@ configure do
     disable :protection
 end
 
-before '/api/*' do
+before do
     headers['Access-Control-Allow-Origin'] = '*'
 end
 
