@@ -53,8 +53,8 @@ get '/utc_time/now.json' do
     hour   = utc_timestamp.hour
     minute = utc_timestamp.minute
     consolidated_data(lat, lon, year, month, day, hour, minute).to_json
-rescue
-    { message: 'That didn\'t work...' }.to_json
+rescue => error
+    { message: error.message }.to_json
 end
 
 get '/utc_time/:utc_timestamp.json' do
