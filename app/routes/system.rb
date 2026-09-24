@@ -43,6 +43,34 @@ get '/:uuid' do
     erb :chart
 end
 
+get '/utc_time/now.json' do
+    utc_timestamp = Time.now
+    lat    = 0
+    lon    = 0
+    year   = utc_timestamp.year
+    month  = utc_timestamp.month
+    day    = utc_timestamp.day
+    hour   = utc_timestamp.hour
+    minute = utc_timestamp.minute
+    consolidated_data(lat, lon, year, month, day, hour, minute).to_json
+rescue
+    { message: 'That didn\'t work...' }.to_json
+end
+
+get '/utc_time/:utc_timestamp.json' do
+    utc_timestamp = Time.parse(params[:utc_timestamp])
+    lat    = 0
+    lon    = 0
+    year   = utc_timestamp.year
+    month  = utc_timestamp.month
+    day    = utc_timestamp.day
+    hour   = utc_timestamp.hour
+    minute = utc_timestamp.minute
+    consolidated_data(lat, lon, year, month, day, hour, minute).to_json
+rescue
+    { message: 'That didn\'t work...' }.to_json
+end
+
 not_found do
     redirect '/'
 end
