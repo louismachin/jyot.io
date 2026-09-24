@@ -51,7 +51,7 @@ get '/utc_time/now.json' do
     month  = utc_timestamp.month
     day    = utc_timestamp.day
     hour   = utc_timestamp.hour
-    minute = utc_timestamp.minute
+    minute = utc_timestamp.minutes
     consolidated_data(lat, lon, year, month, day, hour, minute).to_json
 rescue => error
     { message: error.message }.to_json
@@ -65,7 +65,7 @@ get '/utc_time/:utc_timestamp.json' do
     month  = utc_timestamp.month
     day    = utc_timestamp.day
     hour   = utc_timestamp.hour
-    minute = utc_timestamp.minute
+    minute = utc_timestamp.minutes
     consolidated_data(lat, lon, year, month, day, hour, minute).to_json
 rescue
     { message: 'That didn\'t work...' }.to_json
